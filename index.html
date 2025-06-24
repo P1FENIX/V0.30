@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Character Sheet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+        <div id="welcome-screen" class="screen active">
+            <h1>Bem-vindo ao Criador de Personagens!</h1>
+            <button id="open-menu-button">Começar</button>
+        </div>
+
+        <div id="character-creation-menu" class="screen">
+            <h2>Criação de Personagem</h2>
+            <div class="input-group">
+                <label for="character-name">Nome do Personagem:</label>
+                <input type="text" id="character-name" placeholder="Digite o nome">
+            </div>
+            <button id="next-to-race-button">Próximo</button>
+        </div>
+
+        <div id="race-selection-screen" class="screen">
+            <h2>Escolha sua Raça</h2>
+            <div class="race-buttons-container">
+                <button class="race-button" data-race="Humano">Humano</button>
+                <button class="race-button" data-race="Villager">Villager</button>
+                <button class="race-button" data-race="Anão">Anão</button>
+                <button class="race-button" data-race="Elfo">Elfo</button>
+                <button class="race-button" data-race="Fada">Fada</button>
+                <button class="race-button" data-race="Golem">Golem</button>
+                <button class="race-button" data-race="Gnomo">Gnomo</button>
+                <button class="race-button" data-race="Sereia">Sereia</button>
+            </div>
+
+            <div id="attribute-choice" class="hidden">
+                <h3>Atributos</h3>
+                <button id="roll-dice-button">Rolar Atributos</button>
+                <button id="manual-attributes-button">Inserir Manualmente</button>
+                <div id="rolled-attributes" class="hidden"></div>
+                <button id="next-to-status-button" class="hidden">Ver Status</button>
+            </div>
+        </div>
+
+        <div id="status-screen" class="screen">
+            <h2>Status do Personagem</h2>
+            <div class="character-details">
+                <p><strong>Nome:</strong> <span id="display-name"></span></p>
+                <p><strong>Raça:</strong> <span id="display-race"></span></p>
+                <h3>Atributos:</h3>
+                <ul>
+                    <li>Força: <span id="display-forca"></span></li>
+                    <li>Vigor: <span id="display-vigor"></span></li>
+                    <li>Agilidade: <span id="display-agilidade"></span></li>
+                    <li>Inteligência: <span id="display-inteligencia"></span></li>
+                    <li>Sabedoria: <span id="display-sabedoria"></span></li>
+                    <li>Sorte: <span id="display-sorte"></span></li>
+                    <li>Carisma: <span id="display-carisma"></span></li>
+                    <li>Tamanho: <span id="display-tamanho"></span></li>
+                    <li>Aparência: <span id="display-aparencia"></span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="app-content-area">
+            </div>
+
+        <button id="mainFloatingBtn" class="floating-btn">☰</button>
+
+        <nav class="floating-nav">
+            <button id="showStatusBtn">Status</button>
+            <button id="showPericiasBtn">Perícias</button>
+            <button id="togglePerfisBtn">Perfis</button>
+        </nav>
+
+        <div id="configPerfisWrapper" class="config-perfis-wrapper">
+            <div class="config-perfis-content">
+                <h3>Gerenciar Perfis</h3>
+                <p class="mensagem-perfil" id="mensagemPerfil"></p>
+                <div class="profile-actions">
+                    <div class="profile-slot">
+                        <span>Perfil 1:</span>
+                        <button id="salvarPerfil1">Salvar</button>
+                        <button id="carregarPerfil1">Carregar</button>
+                    </div>
+                    <div class="profile-slot">
+                        <span>Perfil 2:</span>
+                        <button id="salvarPerfil2">Salvar</button>
+                        <button id="carregarPerfil2">Carregar</button>
+                    </div>
+                    <div class="profile-slot">
+                        <span>Perfil 3:</span>
+                        <button id="salvarPerfil3">Salvar</button>
+                        <button id="carregarPerfil3">Carregar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

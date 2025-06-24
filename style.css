@@ -1,0 +1,521 @@
+/* Estilos Gerais */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a0101; /* Preto muito escuro, quase rubro */
+    color: #f7e0c4; /* Tonalidade de branco queimado/creme */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Alinha ao topo para melhor visualização de conteúdo longo */
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#app-container {
+    background: linear-gradient(145deg, #2b0303, #4a0505); /* Gradiente de vermelho escuro a mais escuro */
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(255, 0, 0, 0.4), 0 0 40px rgba(255, 100, 0, 0.2); /* Sombra mais vibrante */
+    width: 100%;
+    max-width: 800px; /* Largura máxima para o conteúdo principal */
+    padding: 25px;
+    box-sizing: border-box;
+    position: relative; /* Para posicionar o botão flutuante e o menu flutuante */
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o conteúdo horizontalmente no container principal */
+    justify-content: flex-start;
+    border: 1px solid #ff4500; /* Borda laranja avermelhada */
+}
+
+h1, h2, h3 {
+    color: #ff6f00; /* Laranja vibrante para títulos */
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6); /* Sombra para o texto do título */
+}
+
+/* Estilos para Telas (Screens) e Seções de Conteúdo */
+.screen, .content-section {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #3b0404; /* Vermelho escuro para o fundo das seções */
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* Sombra interna mais escura */
+    display: none; /* Por padrão, todas as telas e seções estão ocultas */
+    flex-direction: column;
+    gap: 15px;
+    animation: fadeIn 0.5s ease-out;
+    border: 1px solid #ff8c00; /* Borda laranja mais clara para seções */
+}
+
+.screen.active, .content-section.active-view {
+    display: flex; /* Exibe a tela ativa */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos para Botões */
+button {
+    background-color: #e65100; /* Laranja avermelhado intenso */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    flex-shrink: 0; /* Impede que os botões encolham em flexbox */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+button:hover {
+    background-color: #ff5722; /* Laranja mais vivo no hover */
+    transform: translateY(-2px); /* Pequeno efeito de elevação */
+}
+
+button:disabled {
+    background-color: #6d1a1a; /* Vermelho escuro para desabilitado */
+    cursor: not-allowed;
+}
+
+/* Estilos para Inputs */
+input[type="text"],
+input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ff6f00; /* Borda laranja para inputs */
+    border-radius: 5px;
+    background-color: #4a0505; /* Fundo vermelho escuro para inputs */
+    color: #f7e0c4;
+    font-size: 1rem;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4);
+}
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
+    color: #f7e0c4a0; /* Placeholder mais claro, mas com transparência */
+}
+
+.input-group {
+    margin-bottom: 15px;
+    text-align: center; /* Centraliza labels e inputs dentro do grupo */
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #ffbb00; /* Laranja amarelado para labels */
+}
+
+/* Estilos Específicos para Seções */
+
+/* Criação de Personagem */
+#character-creation-menu {
+    transition: all 0.4s ease-in-out;
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none; /* Desabilita interações quando oculto */
+    position: absolute; /* Permite centralizar o conteúdo com flexbox */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center; /* Centraliza horizontalmente o conteúdo */
+    align-items: center;   /* Centraliza verticalmente o conteúdo */
+    background-color: rgba(0, 0, 0, 0.7); /* Fundo semi-transparente para o menu */
+    z-index: 10;
+    padding: 0; /* Remove padding extra para o modal */
+    border-radius: 10px;
+    text-align: center; /* Garante que o texto e botões internos estejam centralizados */
+}
+
+#character-creation-menu.open {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: all;
+}
+
+#character-creation-menu h2 {
+    margin-top: 0;
+}
+
+/* Seleção de Raça */
+.race-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center; /* Centraliza os botões de raça */
+    margin-bottom: 20px;
+}
+
+.race-button {
+    background-color: #d32f2f; /* Vermelho mais forte para botões de raça */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    border: 1px solid #ff8c00;
+}
+
+.race-button:hover {
+    background-color: #ff0000; /* Vermelho puro no hover */
+}
+
+.race-button.selected { /* Estilo para raça selecionada */
+    border: 2px solid #ffcc00; /* Borda laranja amarelada */
+    box-shadow: 0 0 15px rgba(255, 150, 0, 0.7); /* Efeito de brilho */
+    transform: scale(1.05); /* Levemente maior */
+}
+
+#attribute-choice {
+    background-color: #5a0606; /* Vermelho mais suave para a seção de atributos */
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center; /* Centraliza o conteúdo dentro da div de escolha de atributos */
+    border: 1px solid #ffad42;
+}
+
+#attribute-choice button {
+    margin: 5px;
+}
+
+#rolled-attributes {
+    text-align: center; /* Centraliza o título "Atributos Rolados" e a lista */
+}
+
+#rolled-attributes ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Centraliza os itens da lista */
+    gap: 10px;
+}
+
+#rolled-attributes li {
+    background-color: #6a0707; /* Vermelho escuro para os itens da lista de atributos */
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-weight: bold;
+    border: 1px solid #ffad42;
+}
+
+/* Tela de Status */
+.character-details {
+    background-color: #5a0606;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ffad42;
+}
+
+.character-details p, .character-details li {
+    font-size: 1.1em;
+    margin-bottom: 8px;
+}
+
+.character-details ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+.character-details strong {
+    color: #ff6f00; /* Laranja vibrante para negritos */
+}
+
+/* Seção de Perícias */
+#periciasView {
+    padding-top: 0; /* Ajuste para o campo de busca */
+}
+
+.search-container {
+    margin-bottom: 15px;
+    text-align: center; /* Centraliza o conteúdo do container de busca */
+}
+
+.search-container input {
+    width: calc(100% - 40px); /* Ajuste para centralizar melhor */
+    max-width: 400px;
+    margin: 0 auto;
+    display: block;
+}
+
+.pericias-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Colunas responsivas */
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.pericia-item {
+    background-color: #5a0606;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    border: 1px solid #ffad42;
+}
+
+.pericia-item label {
+    font-weight: bold;
+    color: #ffbb00; /* Laranja amarelado para labels de perícias */
+}
+
+.pericia-item input {
+    width: 100px; /* Largura fixa para o input de número */
+    text-align: center;
+    margin-bottom: 0; /* Remove a margem inferior padrão */
+    align-self: center; /* Centraliza o input de número se for o único item na linha */
+}
+
+.pericia-item button {
+    width: 100%;
+    margin-top: 5px;
+    background-color: #ff6f00; /* Laranja para o botão de rolar */
+}
+
+.pericia-item button:hover {
+    background-color: #ff8c00;
+}
+
+.resultado {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid; /* Adiciona uma borda base para todos os resultados */
+}
+
+/* Ajustes para os resultados da rolagem conforme o tema Fênix */
+.resultado.sucesso-perfeito { background-color: #4CAF50; color: white; border-color: #27ae60; } /* Verde para sucesso */
+.resultado.sucesso-otimo { background-color: #2ecc71; color: white; border-color: #27ae60; }
+.resultado.sucesso-bom { background-color: #3498db; color: white; border-color: #2980b9; }
+.resultado.sucesso-normal { background-color: #5cb85c; color: white; border-color: #4CAF50; }
+.resultado.fracasso { background-color: #c0392b; color: white; border-color: #a02d20; } /* Vermelho mais escuro para fracasso */
+.resultado.fracasso-total { background-color: #e74c3c; color: white; border-color: #c0392b; } /* Vermelho ainda mais escuro */
+.resultado.info-classificacao { background-color: #8e44ad; color: white; border-color: #9b59b6; }
+.resultado.erro-classificacao { background-color: #f1c40f; color: #333; border-color: #d8ad0d; }
+
+.pericia-item.hidden {
+    display: none;
+}
+
+.botoes-globais {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.botoes-globais button {
+    background-color: #a30000; /* Vermelho escuro para reiniciar */
+}
+
+.botoes-globais button:hover {
+    background-color: #cc0000; /* Vermelho mais vivo no hover */
+}
+
+/* Botão Flutuante Principal */
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #d32f2f; /* Vermelho forte para o botão principal */
+    color: white;
+    font-size: 2rem;
+    display: none; /* <--- ADICIONE ESTA LINHA */
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.6); /* Sombra de fogo */
+    z-index: 100; /* Acima de tudo */
+    border: 2px solid #ff8c00; /* Borda laranja */
+}
+
+.floating-btn:hover {
+    background-color: #ff0000; /* Vermelho puro no hover */
+    box-shadow: 0 4px 20px rgba(255, 0, 0, 0.8), 0 0 30px rgba(255, 100, 0, 0.4);
+}
+
+/* Navegação Flutuante */
+.floating-nav {
+    position: fixed;
+    bottom: 90px; /* Acima do botão principal */
+    right: 20px;
+    background-color: #3b0404; /* Vermelho escuro para o fundo da navegação */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out, visibility 0.3s;
+    z-index: 99;
+    border: 1px solid #ff8c00; /* Borda laranja */
+}
+
+.floating-nav.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.floating-nav button {
+    width: 100%;
+    background-color: #8b0000; /* Vermelho escuro para botões de navegação */
+}
+
+.floating-nav button:hover {
+    background-color: #a30000; /* Vermelho mais escuro no hover */
+}
+
+/* Configuração de Perfis (Modal/Overlay) */
+.config-perfis-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* Fundo mais opaco */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-out, visibility 0.3s;
+    z-index: 110; /* Acima do menu flutuante */
+}
+
+.config-perfis-wrapper.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.config-perfis-content {
+    background-color: #2b0303; /* Vermelho muito escuro para o conteúdo do modal */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 30px rgba(255, 0, 0, 0.7); /* Sombra mais intensa */
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform 0.3s ease-out;
+    border: 2px solid #ff6f00; /* Borda laranja vibrante */
+}
+
+.config-perfis-wrapper.active .config-perfis-content {
+    transform: scale(1);
+}
+
+.config-perfis-content h3 {
+    color: #ff6f00;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.profile-slot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #4a0505; /* Vermelho escuro para os slots de perfil */
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #ffad42;
+}
+
+.profile-slot span {
+    font-weight: bold;
+    flex-grow: 1;
+    text-align: left;
+    color: #f7e0c4;
+}
+
+.profile-slot button {
+    margin-left: 10px;
+    background-color: #d32f2f; /* Vermelho para salvar/carregar */
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+.profile-slot button:hover {
+    background-color: #ff0000;
+}
+
+.mensagem-perfil {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    display: block;
+    min-height: 20px; /* Garante que a div tenha altura mesmo vazia */
+    box-sizing: border-box;
+}
+
+.mensagem-perfil.sucesso { background-color: #e65100; color: white; } /* Laranja para sucesso */
+.mensagem-perfil.fracasso { background-color: #c0392b; color: white; } /* Vermelho para fracasso */
+.mensagem-perfil.info { background-color: #ff8c00; color: white; } /* Laranja amarelado para info */
+
+
+/* Utilitários */
+.hidden {
+    display: none !important;
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+    #app-container {
+        padding: 15px;
+    }
+
+    .screen, .content-section {
+        padding: 15px;
+    }
+
+    .floating-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.8rem;
+    }
+
+    .floating-nav {
+        right: 15px;
+        bottom: 75px;
+    }
+
+    .pericias-container {
+        grid-template-columns: 1fr; /* Uma coluna em telas menores */
+    }
+
+    .profile-slot {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .profile-slot button {
+        margin-left: 0;
+        margin-top: 8px;
+    }
+}
