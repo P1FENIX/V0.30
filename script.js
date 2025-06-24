@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Variáveis e Seletores do Sistema de Criação de Personagem (Original 1º Código) ---
+    // --- Variáveis e Seletores do Sistema de Criação de Personagem ---
     const welcomeScreen = document.getElementById('welcome-screen');
     const characterCreationMenu = document.getElementById('character-creation-menu');
     const raceSelectionScreen = document.getElementById('race-selection-screen');
@@ -23,17 +23,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const displayInteligencia = document.getElementById('display-inteligencia');
     const displaySabedoria = document.getElementById('display-sabedoria');
     const displaySorte = document.getElementById('display-sorte');
-    const displayCarisma = document.getElementById('display-carisma');
+    const displayCarisma = document = document.getElementById('display-carisma');
     const displayTamanho = document.getElementById('display-tamanho');
     const displayAparencia = document.getElementById('display-aparencia');
 
+    // O objeto currentCharacter agora faz parte do estado geral do perfil
     let currentCharacter = {
         name: '',
         race: '',
         attributes: {}
     };
 
-    // --- Variáveis e Seletores do Sistema de Perícias (Original 2º Código) ---
+    // --- Variáveis e Seletores do Sistema de Perícias ---
     const periciasLista = [
         "Charme", "Intimidação", "Lábia", "Acalmar",
         "Artes", "Ciências", "Investigação", "Alquimia", "Engenharia",
@@ -70,9 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNÇÕES COMPARTILHADAS/UTILITY ---
 
-    /**
-     * Função para rolar dados (do primeiro código).
-     */
     function rollDice(diceString) {
         let total = 0;
         const parts = diceString.split('+');
@@ -90,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return total;
     }
 
-    // Definições de atributos por raça (do primeiro código).
     const raceAttributes = {
         "Humano": {
             "Força": "3D6", "Vigor": "3D6", "Agilidade": "3D6",
@@ -134,48 +131,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    /**
-     * Exibe uma seção específica e oculta as outras.
-     * Integrado do segundo código, mas adaptado para as telas existentes.
-     * @param {HTMLElement} screenToShow O elemento da tela a ser exibida.
-     */
     function showScreen(screenToShow) {
         document.querySelectorAll('.screen').forEach(screen => {
             screen.classList.remove('active');
-            screen.style.display = 'none'; // Garante que estejam ocultas
+            screen.style.display = 'none';
         });
         document.querySelectorAll('.content-section').forEach(section => {
             section.classList.remove('active-view');
-            section.style.display = 'none'; // Garante que estejam ocultas
+            section.style.display = 'none';
         });
 
-        // Adiciona a classe ativa e define o display
         screenToShow.classList.add('active');
-        screenToShow.style.display = 'flex'; // Mantém como 'flex' para as telas que usam flexbox
+        screenToShow.style.display = 'flex';
 
-        // A tela de criação de personagem tem um comportamento de modal que precisa de sua própria classe 'open'
-        // para a transição de posição.
         if (screenToShow.id === 'character-creation-menu') {
             screenToShow.classList.add('open');
         } else {
             characterCreationMenu.classList.remove('open');
         }
 
-        floatingNav.classList.remove('active'); // Fecha o menu flutuante ao navegar
+        floatingNav.classList.remove('active');
     }
 
-    /**
-     * Alterna a visibilidade do painel de gerenciamento de perfis.
-     * (Do segundo código)
-     */
     function togglePerfisVisibility() {
         configPerfisWrapper.classList.toggle('active');
     }
 
-    /**
-     * Exibe uma mensagem temporária para o usuário.
-     * (Do segundo código)
-     */
     function exibirMensagem(texto, tipo = '') {
         mensagemPerfil.textContent = texto;
         mensagemPerfil.className = `mensagem-perfil ${tipo}`;
@@ -186,85 +167,124 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Carrega os valores das perícias de um perfil salvo no Local Storage.
-     * (Do segundo código)
+     * Carrega um perfil completo (perícias + dados do personagem) do Local Storage.
+     * @param {string} perfilKey Chave do perfil no Local Storage.
+     * @returns {object} Objeto contendo os dados do personagem e as perícias, ou um objeto vazio.
      */
-    function carregarPericiasDePerfil(perfilKey) {
-        const savedPericias = localStorage.getItem(perfilKey);
-        return savedPericias ? JSON.parse(savedPericias) : {};
+    function carregarPerfilCompleto(perfilKey) {
+        const savedData = localStorage.getItem(perfilKey);
+        return savedData ? JSON.parse(savedData) : { character: {}, pericias: {} };
     }
 
     /**
-     * Salva os valores atuais das perícias no Local Storage para um perfil específico.
-     * (Do segundo código)
+     * Salva o estado atual completo (perícias + dados do personagem) no Local Storage para um perfil específico.
+     * @param {string} perfilKey Chave do perfil no Local Storage.
      */
-    function salvarPericiasEmPerfil(perfilKey) {
-        const valoresParaSalvar = {};
+    function salvarPerfilCompleto(perfilKey) {
+        const valoresPericias = {};
         periciasLista.forEach((_, index) => {
             const inputPericia = document.getElementById(`pericia-${index}`);
             if (inputPericia) {
-                valoresParaSalvar[`pericia-${index}`] = inputPericia.value;
+                valoresPericias[`pericia-${index}`] = inputPericia.value;
             }
         });
-        localStorage.setItem(perfilKey, JSON.stringify(valoresParaSalvar));
+
+        const dataToSave = {
+            character: currentCharacter,
+            pericias: valoresPericias
+        };
+
+        localStorage.setItem(perfilKey, JSON.stringify(dataToSave));
         exibirMensagem(`Perfil ${perfilKey.replace('perfil', '')} salvo!`, 'sucesso');
     }
 
     /**
-     * Aplica os valores carregados de um perfil aos inputs das perícias.
-     * (Do segundo código)
+     * Aplica os valores carregados de um perfil aos inputs das perícias e ao objeto do personagem.
+     * @param {object} loadedData Objeto com dados do personagem e perícias.
      */
-    function aplicarPericiasCarregadas(loadedValues) {
+    function aplicarPerfilCarregado(loadedData) {
+        // Aplica dados do personagem
+        currentCharacter = loadedData.character || { name: '', race: '', attributes: {} };
+        updateCharacterDisplay(); // Atualiza a exibição na tela de status
+        characterNameInput.value = currentCharacter.name || ''; // Atualiza o input de nome
+
+        // Se houver uma raça selecionada, aplica a classe 'selected' ao botão
+        raceButtons.forEach(btn => {
+            if (btn.dataset.race === currentCharacter.race) {
+                btn.classList.add('selected');
+            } else {
+                btn.classList.remove('selected');
+            }
+        });
+
+        // Se houver atributos rolados, mostra-os
+        if (currentCharacter.attributes && Object.keys(currentCharacter.attributes).length > 0) {
+            rolledAttributesDiv.innerHTML = '<h3>Atributos Rolados:</h3><ul>';
+            for (const attr in currentCharacter.attributes) {
+                rolledAttributesDiv.innerHTML += `<li>${attr}: ${currentCharacter.attributes[attr]}</li>`;
+            }
+            rolledAttributesDiv.innerHTML += '</ul>';
+            rolledAttributesDiv.classList.remove('hidden');
+            nextToStatusButton.classList.remove('hidden');
+            attributeChoiceDiv.classList.remove('hidden'); // Certifica que a div de escolha de atributos está visível
+        } else {
+            rolledAttributesDiv.innerHTML = '';
+            rolledAttributesDiv.classList.add('hidden');
+            nextToStatusButton.classList.add('hidden');
+            attributeChoiceDiv.classList.add('hidden'); // Oculta se não houver atributos
+        }
+
+
+        // Aplica valores das perícias
+        const loadedPericias = loadedData.pericias || {};
         periciasLista.forEach((_, index) => {
             const inputPericia = document.getElementById(`pericia-${index}`);
             if (inputPericia) {
-                inputPericia.value = loadedValues[`pericia-${index}`] || "50";
+                inputPericia.value = loadedPericias[`pericia-${index}`] || "50";
             }
         });
         filterPericias(); // Reaplicar filtro após carregar novos valores
     }
 
     /**
-     * Salva o estado atual dos inputs de perícia no perfil 'perfilAtual'.
-     * Chamado a cada mudança nos inputs. (Do segundo código)
+     * Salva o estado atual (perícias e dados do personagem) no perfil 'perfilAtual'.
+     * Chamado a cada mudança nos inputs ou dados do personagem.
      */
     function salvarPerfilAtual() {
-        const valoresParaSalvar = {};
-        periciasLista.forEach((_, index) => {
-            const inputPericia = document.getElementById(`pericia-${index}`);
-            if (inputPericia) {
-                valoresParaSalvar[`pericia-${index}`] = inputPericia.value;
-            }
-        });
-        localStorage.setItem('perfilAtual', JSON.stringify(valoresParaSalvar));
+        salvarPerfilCompleto('perfilAtual');
     }
 
     /**
      * Carrega o perfil 'perfilAtual' ao iniciar a aplicação.
-     * (Do segundo código)
      */
     function carregarPerfilInicial() {
-        const loadedValues = carregarPericiasDePerfil('perfilAtual');
-        if (Object.keys(loadedValues).length > 0) {
-            aplicarPericiasCarregadas(loadedValues);
+        const loadedData = carregarPerfilCompleto('perfilAtual');
+        if (Object.keys(loadedData.character).length > 0 || Object.keys(loadedData.pericias).length > 0) {
+            aplicarPerfilCarregado(loadedData);
             exibirMensagem("Valores do último uso carregados!", 'info');
         } else {
-            exibirMensagem("Iniciado com valores padrão (50).", 'info');
+            exibirMensagem("Iniciado com valores padrão (50) e personagem vazio.", 'info');
         }
     }
 
-    /**
-     * Gera um número aleatório entre 1 e 100 (inclusive).
-     * (Do segundo código)
-     */
+    function updateCharacterDisplay() {
+        displayName.textContent = currentCharacter.name || 'N/A';
+        displayRace.textContent = currentCharacter.race || 'N/A';
+        displayForca.textContent = currentCharacter.attributes.Força || 0;
+        displayVigor.textContent = currentCharacter.attributes.Vigor || 0;
+        displayAgilidade.textContent = currentCharacter.attributes.Agilidade || 0;
+        displayInteligencia.textContent = currentCharacter.attributes.Inteligencia || 0;
+        displaySabedoria.textContent = currentCharacter.attributes.Sabedoria || 0;
+        displaySorte.textContent = currentCharacter.attributes.Sorte || 0;
+        displayCarisma.textContent = currentCharacter.attributes.Carisma || 0;
+        displayTamanho.textContent = currentCharacter.attributes.Tamanho || 0;
+        displayAparencia.textContent = currentCharacter.attributes.Aparência || 0;
+    }
+
     function rolarD100() {
         return Math.floor(Math.random() * 100) + 1;
     }
 
-    /**
-     * Determina o tipo e a classe CSS do resultado da rolagem com base nas regras fornecidas.
-     * (Lógica revisada para sucessos crescentes)
-     */
     function determinarResultado(valorPericia, rolagem) {
         valorPericia = parseInt(valorPericia, 10);
 
@@ -272,47 +292,30 @@ document.addEventListener('DOMContentLoaded', () => {
             return { tipo: "Valor inválido (1-100)", classe: "erro-classificacao" };
         }
 
-        // Caso de Fracasso Total (100)
         if (rolagem === 100) {
             return { tipo: "FRACASSO TOTAL!", classe: "fracasso-total" };
         }
 
-        // Caso de Fracasso (rolagem > valor da perícia)
         if (rolagem > valorPericia) {
             return { tipo: "Fracasso!", classe: "fracasso" };
         }
 
-        // Sucessos Extremos (1 e o valor exato da perícia)
         if (rolagem === 1 || rolagem === valorPericia) {
             return { tipo: "SUCESSO PERFEITO!", classe: "sucesso-perfeito" };
         }
 
-        // Calcular os limites para Sucesso Ótimo, Bom e Normal (crescente)
-        // Os limites são as porcentagens DO VALOR DA PERÍCIA, a rolagem deve ser MAIOR OU IGUAL a eles.
-        // Para uma rolagem "mais perto do número exato da perícia" ser melhor,
-        // os limites são invertidos: 18% para Ótimo (acima de 82% do valor), 30% para Bom (acima de 50% do valor), etc.
-
-        // Sucesso Ótimo: rolagens entre (ValorPericia * 0.82) e (ValorPericia - 1)
-        const limiteOtimo = Math.ceil(valorPericia * 0.82); // Ex: 100 * 0.82 = 82. Rolagens de 82 a 99 (se 100 for o valor)
-
-        // Sucesso Bom: rolagens entre (ValorPericia * 0.50) e (limiteOtimo - 1)
-        const limiteBom = Math.ceil(valorPericia * 0.50); // Ex: 100 * 0.50 = 50. Rolagens de 50 a 81
+        const limiteOtimo = Math.ceil(valorPericia * 0.82);
+        const limiteBom = Math.ceil(valorPericia * 0.50);
 
         if (rolagem >= limiteOtimo) {
             return { tipo: "Sucesso Ótimo!", classe: "sucesso-otimo" };
         } else if (rolagem >= limiteBom) {
             return { tipo: "Sucesso Bom!", classe: "sucesso-bom" };
         } else {
-            // Sucesso Normal: rolagens entre 2 e (limiteBom - 1)
             return { tipo: "Sucesso Normal!", classe: "sucesso-normal" };
         }
     }
 
-
-    /**
-     * Filtra as perícias visíveis com base no termo de pesquisa.
-     * (Do segundo código)
-     */
     function filterPericias() {
         if (!searchInput || !periciasContainer) return;
         const searchTerm = searchInput.value.toLowerCase();
@@ -329,33 +332,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Reinicia todos os valores das perícias para o padrão e limpa os perfis salvos.
-     * (Do segundo código)
+     * Reinicia todos os valores das perícias, dados do personagem e limpa os perfis salvos.
      */
     function resetarTudo() {
+        // Limpa as perícias na UI e Local Storage
         periciasLista.forEach((_, index) => {
             const inputPericia = document.getElementById(`pericia-${index}`);
             const resultadoDiv = document.getElementById(`resultado-${index}`);
-
             if (inputPericia) inputPericia.value = "50";
             if (resultadoDiv) {
                 resultadoDiv.textContent = "";
                 resultadoDiv.className = 'resultado';
             }
         });
+
+        // Limpa os dados do personagem na UI e Local Storage
+        currentCharacter = { name: '', race: '', attributes: {} };
+        characterNameInput.value = '';
+        updateCharacterDisplay();
+        rolledAttributesDiv.innerHTML = '';
+        rolledAttributesDiv.classList.add('hidden');
+        nextToStatusButton.classList.add('hidden');
+        attributeChoiceDiv.classList.add('hidden');
+        raceButtons.forEach(btn => btn.classList.remove('selected'));
+
+        // Remove todos os perfis completos salvos
         localStorage.removeItem('perfil1');
         localStorage.removeItem('perfil2');
         localStorage.removeItem('perfil3');
         localStorage.removeItem('perfilAtual');
+
         exibirMensagem("Todos os perfis e valores resetados!", 'info');
         if (searchInput) searchInput.value = '';
         filterPericias();
     }
 
-    /**
-     * Gera os cards de perícia no container de perícias.
-     * (Do segundo código)
-     */
     function gerarPericiasNoHTML() {
         if (!periciasContainer) {
             console.error("periciasContainer não encontrado ao tentar gerar perícias.");
@@ -375,7 +386,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             periciasContainer.appendChild(periciaDiv);
 
-            // Adiciona event listeners para salvar o perfil atual ao alterar inputs
             const inputPericia = document.getElementById(`pericia-${index}`);
             if (inputPericia) {
                 inputPericia.addEventListener('change', salvarPerfilAtual);
@@ -384,19 +394,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     // --- FUNÇÕES DE INICIALIZAÇÃO DE SEÇÕES ---
 
-    /**
-     * Cria e injeta a estrutura das seções principais (Perícias e Status) no DOM.
-     * As referências para os elementos internos são obtidas APÓS a criação.
-     * Modificado para usar o `statusScreen` existente.
-     */
     function initializeSections() {
-        // Seção de Perícias
         periciasView = document.createElement('div');
         periciasView.id = 'periciasView';
-        periciasView.classList.add('content-section', 'screen'); // Adicionado 'screen' para compatibilidade
+        periciasView.classList.add('content-section', 'screen');
         periciasView.innerHTML = `
             <div class="search-container">
                 <input type="text" id="searchInput" placeholder="Pesquisar perícia...">
@@ -408,10 +411,8 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         appContentArea.appendChild(periciasView);
 
-        // O 'statusScreen' já existe no HTML e será o 'statusView'
-        statusView = statusScreen; // Atribui a referência
+        statusView = statusScreen;
 
-        // IMPORTANTE: Obtém as referências dos elementos internos APÓS serem injetados no DOM
         searchInput = periciasView.querySelector('#searchInput');
         periciasContainer = periciasView.querySelector('.pericias-container');
         resetarBtn = periciasView.querySelector('#resetarBtn');
@@ -420,32 +421,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURAÇÃO DE EVENT LISTENERS ---
 
     function setupEventListeners() {
-        // Eventos do menu de criação de personagem (do primeiro código)
         openMenuButton.addEventListener('click', () => {
-            showScreen(characterCreationMenu); // Mostra a tela de criação ao clicar em 'Começar'
-            // A classe 'open' é adicionada dentro de showScreen agora para melhor controle
+            showScreen(characterCreationMenu);
         });
 
         nextToRaceButton.addEventListener('click', () => {
             const charName = characterNameInput.value.trim();
             if (charName) {
                 currentCharacter.name = charName;
-                // A classe 'open' é removida dentro de showScreen ao mudar de tela
+                salvarPerfilAtual();
                 showScreen(raceSelectionScreen);
             } else {
                 alert('Por favor, digite o nome do personagem!');
             }
         });
 
+        characterNameInput.addEventListener('input', salvarPerfilAtual); // Salva ao digitar
+
         raceButtons.forEach(button => {
             button.addEventListener('click', (event) => {
-                // Remove a classe 'selected' de todos os botões de raça
                 raceButtons.forEach(btn => btn.classList.remove('selected'));
-                // Adiciona a classe 'selected' ao botão clicado
                 event.target.classList.add('selected');
 
                 currentCharacter.race = event.target.dataset.race;
-                // Torna a div attribute-choice visível ao selecionar a raça
+                salvarPerfilAtual();
                 attributeChoiceDiv.classList.remove('hidden');
                 rolledAttributesDiv.innerHTML = '';
                 rolledAttributesDiv.classList.add('hidden');
@@ -468,6 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 rolledAttributesDiv.classList.remove('hidden');
                 nextToStatusButton.classList.remove('hidden');
                 currentCharacter.attributes = rolled;
+                salvarPerfilAtual();
             } else {
                 alert('Por favor, selecione uma raça primeiro!');
             }
@@ -478,24 +478,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         nextToStatusButton.addEventListener('click', () => {
-            displayName.textContent = currentCharacter.name;
-            displayRace.textContent = currentCharacter.race;
-            displayForca.textContent = currentCharacter.attributes.Força || 0;
-            displayVigor.textContent = currentCharacter.attributes.Vigor || 0;
-            displayAgilidade.textContent = currentCharacter.attributes.Agilidade || 0;
-            displayInteligencia.textContent = currentCharacter.attributes.Inteligencia || 0;
-            displaySabedoria.textContent = currentCharacter.attributes.Sabedoria || 0;
-            displaySorte.textContent = currentCharacter.attributes.Sorte || 0;
-            displayCarisma.textContent = currentCharacter.attributes.Carisma || 0;
-            displayTamanho.textContent = currentCharacter.attributes.Tamanho || 0;
-            displayAparencia.textContent = currentCharacter.attributes.Aparencia || 0;
-            showScreen(statusView); // Usa o statusView (que é o statusScreen)
-
-            // <--- ADICIONE ESTA LINHA AQUI
-            mainFloatingBtn.style.display = 'flex'; // Torna o botão flutuante visível
+            updateCharacterDisplay();
+            showScreen(statusView);
+            mainFloatingBtn.style.display = 'flex';
         });
 
-        // Eventos do painel de perfis (do segundo código)
         togglePerfisBtn.addEventListener('click', togglePerfisVisibility);
         configPerfisWrapper.addEventListener('click', (event) => {
             if (event.target === configPerfisWrapper) {
@@ -503,41 +490,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Eventos dos botões de salvar/carregar perfil (do segundo código)
-        salvarPerfil1Btn.addEventListener('click', () => salvarPericiasEmPerfil('perfil1'));
+        // Eventos dos botões de salvar/carregar perfil
+        salvarPerfil1Btn.addEventListener('click', () => salvarPerfilCompleto('perfil1'));
         carregarPerfil1Btn.addEventListener('click', () => {
-            const loaded = carregarPericiasDePerfil('perfil1');
-            if (Object.keys(loaded).length > 0) {
-                aplicarPericiasCarregadas(loaded);
+            const loadedData = carregarPerfilCompleto('perfil1');
+            if (Object.keys(loadedData.character).length > 0 || Object.keys(loadedData.pericias).length > 0) {
+                aplicarPerfilCarregado(loadedData);
                 exibirMensagem("Perfil 1 carregado!", 'sucesso');
+                salvarPerfilAtual(); // Define o perfil carregado como o perfil atual
             } else {
                 exibirMensagem("Perfil 1 vazio! Salve primeiro.", 'fracasso');
             }
         });
 
-        salvarPerfil2Btn.addEventListener('click', () => salvarPericiasEmPerfil('perfil2'));
+        salvarPerfil2Btn.addEventListener('click', () => salvarPerfilCompleto('perfil2'));
         carregarPerfil2Btn.addEventListener('click', () => {
-            const loaded = carregarPericiasDePerfil('perfil2');
-            if (Object.keys(loaded).length > 0) {
-                aplicarPericiasCarregadas(loaded);
+            const loadedData = carregarPerfilCompleto('perfil2');
+            if (Object.keys(loadedData.character).length > 0 || Object.keys(loadedData.pericias).length > 0) {
+                aplicarPerfilCarregado(loadedData);
                 exibirMensagem("Perfil 2 carregado!", 'sucesso');
+                salvarPerfilAtual();
             } else {
                 exibirMensagem("Perfil 2 vazio! Salve primeiro.", 'fracasso');
             }
         });
 
-        salvarPerfil3Btn.addEventListener('click', () => salvarPericiasEmPerfil('perfil3'));
+        salvarPerfil3Btn.addEventListener('click', () => salvarPerfilCompleto('perfil3'));
         carregarPerfil3Btn.addEventListener('click', () => {
-            const loaded = carregarPericiasDePerfil('perfil3');
-            if (Object.keys(loaded).length > 0) {
-                aplicarPericiasCarregadas(loaded);
+            const loadedData = carregarPerfilCompleto('perfil3');
+            if (Object.keys(loadedData.character).length > 0 || Object.keys(loadedData.pericias).length > 0) {
+                aplicarPerfilCarregado(loadedData);
                 exibirMensagem("Perfil 3 carregado!", 'sucesso');
+                salvarPerfilAtual();
             } else {
                 exibirMensagem("Perfil 3 vazio! Salve primeiro.", 'fracasso');
             }
         });
 
-        // Eventos da barra de pesquisa e botão de resetar (do segundo código)
         if (searchInput) {
             searchInput.addEventListener('keyup', filterPericias);
             searchInput.addEventListener('change', filterPericias);
@@ -546,7 +535,6 @@ document.addEventListener('DOMContentLoaded', () => {
             resetarBtn.addEventListener('click', resetarTudo);
         }
 
-        // Event listener para os botões de "Rolar d100" (delegação de evento no container) (do segundo código)
         if (periciasContainer) {
             periciasContainer.addEventListener('click', (event) => {
                 if (event.target.tagName === 'BUTTON' && event.target.hasAttribute('data-pericia-index')) {
@@ -568,7 +556,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Eventos do botão flutuante de navegação (do segundo código)
         mainFloatingBtn.addEventListener('click', (event) => {
             floatingNav.classList.toggle('active');
             event.stopPropagation();
@@ -580,17 +567,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Adaptação dos botões de navegação para usar `showScreen`
         showPericiasBtn.addEventListener('click', () => showScreen(periciasView));
-        showStatusBtn.addEventListener('click', () => showScreen(statusView));
+        showStatusBtn.addEventListener('click', () => {
+            updateCharacterDisplay();
+            showScreen(statusView);
+        });
     }
 
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
-    initializeSections(); // 1. Cria as estruturas das views (perícias e status)
-    gerarPericiasNoHTML(); // 2. Popula a view de perícias (requer periciasContainer existente)
-    setupEventListeners(); // 3. Configura todos os ouvintes de evento (requer elementos existirem)
+    initializeSections();
+    gerarPericiasNoHTML();
+    setupEventListeners();
 
-    // Carrega o perfil inicial (se houver) e mostra a tela de boas-vindas
-    carregarPerfilInicial();
+    carregarPerfilInicial(); // Carrega o perfil inicial (se houver)
     showScreen(welcomeScreen); // Inicia na tela de boas-vindas
 });
